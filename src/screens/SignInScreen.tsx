@@ -60,7 +60,7 @@ export default function SignInScreen() {
       />
       <Input
         label="비밀번호"
-        type="text"
+        type="password"
         value={password}
         onChange={setPassword}
         placeholder="6자 이상"

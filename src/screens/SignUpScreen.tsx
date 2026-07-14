@@ -3,10 +3,16 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod';
 import { useAuth } from '../hooks/useAuth';
+import { ApiError } from '../api/client';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { showToast } from '../store/toast-slice';
 import type { AppDispatch } from '../store/store';
+
+function getSignUpErrorMessage(code: string): string {
+  if (code === 'DUPLICATE_EMAIL') return '이미 사용 중인 이메일입니다';
+  return '회원가입 중 오류가 발생했습니다';
+}
 
 const signUpSchema = z.object({
   name: z.string().min(1, { message: '이름을 입력해주세요' }),
@@ -22,7 +28,7 @@ export default function SignUpScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { signup, error: authError } = useAuth();
+  const { signup } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const [name, setName] = useState('');
@@ -50,8 +56,11 @@ export default function SignUpScreen() {
       const state = location.state as LocationState | null;
       const returnTo = state?.from ?? searchParams.get('returnTo') ?? '/result';
       navigate(returnTo, { replace: true });
-    } catch {
-      dispatch(showToast(authError || '회원가입 실패'));
+    } catch (err) {
+      const message = err instanceof ApiError
+        ? getSignUpErrorMessage(err.errorCode)
+        : '회원가입 중 오류가 발생했습니다';
+      dispatch(showToast(message));
     }
   };
 

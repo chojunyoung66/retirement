@@ -34,10 +34,14 @@ client.interceptors.response.use(
     if (status === 401) {
       console.error(`[API] 401 Unauthorized - ${method} ${url}`);
       console.error('[API] 401 Response:', error.response?.data);
-      // 토큰 만료 또는 무효 → 자동 로그아웃 후 현재 경로 보존하여 로그인 페이지로 이동
-      store.dispatch(signOut());
-      const returnTo = encodeURIComponent(window.location.pathname);
-      window.location.href = `/signin?returnTo=${returnTo}`;
+      const hasToken = !!store.getState().auth.token;
+      if (hasToken) {
+        // 토큰 만료 또는 무효 → 자동 로그아웃 후 현재 경로 보존하여 로그인 페이지로 이동
+        store.dispatch(signOut());
+        const returnTo = encodeURIComponent(window.location.pathname);
+        window.location.href = `/signin?returnTo=${returnTo}`;
+      }
+      // 토큰 없는 401 (로그인 실패 등)은 에러를 그대로 전파
     } else if (status === 403) {
       console.error(`[API] 403 Forbidden - ${method} ${url}`);
     }

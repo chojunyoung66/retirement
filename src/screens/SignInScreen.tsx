@@ -3,10 +3,17 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod';
 import { useAuth } from '../hooks/useAuth';
+import { ApiError } from '../api/client';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { showToast } from '../store/toast-slice';
 import type { AppDispatch } from '../store/store';
+
+function getAuthErrorMessage(code: string): string {
+  if (code === 'INVALID_CREDENTIALS') return '이메일 또는 비밀번호가 올바르지 않습니다';
+  if (code === 'USER_NOT_FOUND') return '존재하지 않는 계정입니다';
+  return '로그인 중 오류가 발생했습니다';
+}
 
 const signInSchema = z.object({
   email: z.string().email({ message: '올바른 이메일 형식이 아니에요' }),
@@ -21,7 +28,7 @@ export default function SignInScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { login, error: authError } = useAuth();
+  const { login } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const [email, setEmail] = useState('');
@@ -47,8 +54,11 @@ export default function SignInScreen() {
       const state = location.state as LocationState | null;
       const returnTo = state?.from ?? searchParams.get('returnTo') ?? '/result';
       navigate(returnTo, { replace: true });
-    } catch {
-      dispatch(showToast(authError || '로그인 실패'));
+    } catch (err) {
+      const message = err instanceof ApiError
+        ? getAuthErrorMessage(err.errorCode)
+        : '로그인 중 오류가 발생했습니다';
+      dispatch(showToast(message));
     }
   };
 

@@ -18,11 +18,13 @@ import NationalPensionSimulationScreen from "./screens/NationalPensionSimulation
 import IrpSimulationScreen from "./screens/IrpSimulationScreen";
 import SeverancePaySimulationScreen from "./screens/SeverancePaySimulationScreen";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <ErrorBoundary />,
     children: [
       { index: true, element: <WelcomeScreen /> },
       { path: "diagnosis", element: <DiagnosisTypeScreen /> },

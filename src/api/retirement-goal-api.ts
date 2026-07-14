@@ -40,7 +40,7 @@ export const createRetirementGoal = async (
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -57,7 +57,7 @@ export const getRetirementGoal = async (): Promise<RetirementGoal> => {
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -76,7 +76,7 @@ export const updateRetirementGoal = async (
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }

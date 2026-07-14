@@ -7,15 +7,26 @@ import { router } from './router';
 import { DiagnosisProvider } from './hooks/useDiagnosis';
 import './index.css';
 
-const rootEl = document.getElementById('root');
-if (!rootEl) throw new Error('#root element not found');
+// MSW 초기화
+async function initializeMSW() {
+  const isDevelopment = (import.meta as any).env?.MODE === 'development';
+  if (isDevelopment) {
+    const { worker } = await import('./server/worker');
+    await worker.start();
+  }
+}
 
-createRoot(rootEl).render(
-  <StrictMode>
-    <Provider store={store}>
-      <DiagnosisProvider>
-        <RouterProvider router={router} />
-      </DiagnosisProvider>
-    </Provider>
-  </StrictMode>,
-);
+initializeMSW().then(() => {
+  const rootEl = document.getElementById('root');
+  if (!rootEl) throw new Error('#root element not found');
+
+  createRoot(rootEl).render(
+    <StrictMode>
+      <Provider store={store}>
+        <DiagnosisProvider>
+          <RouterProvider router={router} />
+        </DiagnosisProvider>
+      </Provider>
+    </StrictMode>,
+  );
+});

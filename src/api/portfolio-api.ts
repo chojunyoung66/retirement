@@ -44,7 +44,7 @@ export const createPortfolio = async (
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -61,7 +61,7 @@ export const getPortfolios = async (): Promise<Portfolio[]> => {
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -78,7 +78,7 @@ export const getPortfolio = async (id: number): Promise<Portfolio> => {
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -98,7 +98,7 @@ export const updatePortfolio = async (
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -110,7 +110,7 @@ export const updatePortfolio = async (
 export const deletePortfolio = async (id: number): Promise<void> => {
   try {
     await client.delete(`/pension-portfolios/${id}`);
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }

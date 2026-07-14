@@ -37,7 +37,7 @@ export const createHealthInsuranceSimulation = async (
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -54,7 +54,7 @@ export const getLatestHealthInsuranceSimulation = async (): Promise<Simulation> 
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -73,7 +73,7 @@ export const createIsaSimulation = async (
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }
@@ -90,7 +90,7 @@ export const getLatestIsaSimulation = async (): Promise<Simulation> => {
       throw new Error('유효하지 않은 응답 형식입니다');
     }
     return parsed.data;
-  } catch (err) {
+  } catch (err: unknown) {
     if (isAxiosError(err)) {
       throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
     }

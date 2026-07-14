@@ -90,6 +90,17 @@ export interface YearlyProjection {
   monthlyGap: number;
   cumulativeGap: number;
   unemploymentBenefitIncome?: number;
+  nationalPensionStarted: boolean;
+}
+
+function getPensionStartAge(birthYear: number | null): number {
+  if (!birthYear) return 65;
+  if (birthYear >= 1969) return 65;
+  if (birthYear >= 1965) return 64;
+  if (birthYear >= 1961) return 63;
+  if (birthYear >= 1957) return 62;
+  if (birthYear >= 1953) return 61;
+  return 60;
 }
 
 export interface UnemploymentBenefitOption {
@@ -105,8 +116,9 @@ export function calculateLongTermProjection(
   unemploymentBenefit?: UnemploymentBenefitOption,
 ): YearlyProjection[] {
   const retirementAge = 60;
-  const baseIncome =
-    state.pension.national + state.pension.retirement + state.pension.personal;
+  const pensionStartAge = getPensionStartAge(state.birthYear ?? null);
+  const baseNational = state.pension.national;
+  const baseOther = state.pension.retirement + state.pension.personal;
   const baseExpense =
     state.livingExpense.desiredMonthly +
     state.medicalExpense.healthInsurance +
@@ -116,8 +128,17 @@ export function calculateLongTermProjection(
   let cumulative = 0;
 
   for (let i = 0; i < years; i++) {
+    const age = retirementAge + i;
     const inflationFactor = Math.pow(1 + inflationRate, i);
     const pensionFactor = Math.pow(1 + pensionGrowthRate, i);
+
+    // 국민연금은 출생연도별 수급 개시 연령부터만 포함
+    const nationalPensionStarted = age >= pensionStartAge;
+    const pensionStartIndex = pensionStartAge - retirementAge;
+    const nationalIncome = nationalPensionStarted
+      ? Math.round(baseNational * Math.pow(1 + pensionGrowthRate, i - pensionStartIndex))
+      : 0;
+    const otherIncome = Math.round(baseOther * pensionFactor);
 
     // 60세(i=0)에 실업급여를 연간 총액의 월평균으로 반영
     const ubIncome =
@@ -127,18 +148,19 @@ export function calculateLongTermProjection(
           )
         : 0;
 
-    const monthlyIncome = Math.round(baseIncome * pensionFactor) + ubIncome;
+    const monthlyIncome = nationalIncome + otherIncome + ubIncome;
     const monthlyExpense = Math.round(baseExpense * inflationFactor);
     const monthlyGap = monthlyIncome - monthlyExpense;
     cumulative += monthlyGap * 12;
 
     result.push({
       year: i + 1,
-      age: retirementAge + i,
+      age,
       monthlyIncome,
       monthlyExpense,
       monthlyGap,
       cumulativeGap: cumulative,
+      nationalPensionStarted,
       ...(ubIncome > 0 ? { unemploymentBenefitIncome: ubIncome } : {}),
     });
   }

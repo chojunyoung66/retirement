@@ -221,6 +221,11 @@ export default function CashFlowPlanScreen() {
                         실업급여 포함
                       </span>
                     ) : null}
+                    {!d.nationalPensionStarted ? (
+                      <span style={{ display: 'block', fontSize: 10, color: '#e67e22' }}>
+                        국민연금 대기
+                      </span>
+                    ) : null}
                   </td>
                   <td>
                     {formatWan(d.monthlyIncome)}

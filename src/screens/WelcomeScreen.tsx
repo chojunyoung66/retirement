@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { getWelcomeMetrics } from '../service/retirement-service';
-import { useSavedPlan } from '../hooks/useSavedPlan';
-import { useDiagnosis } from '../hooks/useDiagnosis';
-import Button from '../components/Button';
+import { useNavigate } from "react-router-dom";
+import { getWelcomeMetrics } from "../service/retirement-service";
+import { useSavedPlan } from "../hooks/useSavedPlan";
+import { useDiagnosis } from "../hooks/useDiagnosis";
+import Button from "../components/Button";
 
 export default function WelcomeScreen() {
   const navigate = useNavigate();
@@ -15,14 +15,14 @@ export default function WelcomeScreen() {
   const formatCount = (n: number) => `${(n / 10000).toFixed(0)}만명`;
 
   const handleStart = () => {
-    dispatch({ type: 'RESET' });
-    navigate('/diagnosis');
+    dispatch({ type: "RESET" });
+    navigate("/diagnosis");
   };
 
   const handleLoad = () => {
     if (saved) {
-      dispatch({ type: 'UPDATE', payload: saved });
-      navigate('/result');
+      dispatch({ type: "UPDATE", payload: saved });
+      navigate("/result");
     }
   };
 
@@ -43,11 +43,15 @@ export default function WelcomeScreen() {
 
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-value">{formatAvg(metrics.averageMonthlyPension)}</div>
+          <div className="stat-value">
+            {formatAvg(metrics.averageMonthlyPension)}
+          </div>
           <div className="stat-label">평균 수령액</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">{formatCount(metrics.completedDiagnoses)}</div>
+          <div className="stat-value">
+            {formatCount(metrics.completedDiagnoses)}
+          </div>
           <div className="stat-label">완료자</div>
         </div>
         <div className="stat-card">
@@ -57,6 +61,12 @@ export default function WelcomeScreen() {
       </div>
 
       <Button onClick={handleStart}>1분 진단 시작하기</Button>
+
+      <div className="mt-16">
+        <Button variant="secondary" onClick={() => navigate("/simulation")}>
+          시뮬레이션
+        </Button>
+      </div>
 
       {saved && (
         <div className="mt-16">

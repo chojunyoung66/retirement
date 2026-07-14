@@ -1,30 +1,35 @@
-import { createBrowserRouter } from 'react-router-dom';
-import App from './App';
-import WelcomeScreen from './screens/WelcomeScreen';
-import DiagnosisTypeScreen from './screens/DiagnosisTypeScreen';
-import ProfileScreen from './screens/ProfileScreen';
-import CashflowInputScreen from './screens/CashflowInputScreen';
-import ScenarioScreen from './screens/ScenarioScreen';
-import MedicalExpenseScreen from './screens/MedicalExpenseScreen';
-import ProjectionScreen from './screens/ProjectionScreen';
-import SummaryScreen from './screens/SummaryScreen';
-import SignInScreen from './screens/SignInScreen';
-import CashFlowPlanScreen from './screens/CashFlowPlanScreen';
-import ProtectedRoute from './components/ProtectedRoute';
+import { createBrowserRouter } from "react-router-dom";
+import App from "./App";
+import WelcomeScreen from "./screens/WelcomeScreen";
+import DiagnosisTypeScreen from "./screens/DiagnosisTypeScreen";
+import ProfileScreen from "./screens/ProfileScreen";
+import CashflowInputScreen from "./screens/CashflowInputScreen";
+import ScenarioScreen from "./screens/ScenarioScreen";
+import MedicalExpenseScreen from "./screens/MedicalExpenseScreen";
+import ProjectionScreen from "./screens/ProjectionScreen";
+import SummaryScreen from "./screens/SummaryScreen";
+import SignInScreen from "./screens/SignInScreen";
+import SignUpScreen from "./screens/SignUpScreen";
+import CashFlowPlanScreen from "./screens/CashFlowPlanScreen";
+import SimulationMenuScreen from "./screens/SimulationMenuScreen";
+import NationalPensionSimulationScreen from "./screens/NationalPensionSimulationScreen";
+import IrpSimulationScreen from "./screens/IrpSimulationScreen";
+import SeverancePaySimulationScreen from "./screens/SeverancePaySimulationScreen";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <App />,
     children: [
       { index: true, element: <WelcomeScreen /> },
-      { path: 'diagnosis', element: <DiagnosisTypeScreen /> },
-      { path: 'profile', element: <ProfileScreen /> },
-      { path: 'cashflow', element: <CashflowInputScreen /> },
-      { path: 'scenario', element: <ScenarioScreen /> },
-      { path: 'medical', element: <MedicalExpenseScreen /> },
+      { path: "diagnosis", element: <DiagnosisTypeScreen /> },
+      { path: "profile", element: <ProfileScreen /> },
+      { path: "cashflow", element: <CashflowInputScreen /> },
+      { path: "scenario", element: <ScenarioScreen /> },
+      { path: "medical", element: <MedicalExpenseScreen /> },
       {
-        path: 'result',
+        path: "result",
         element: (
           <ProtectedRoute>
             <ProjectionScreen />
@@ -32,19 +37,52 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'summary',
+        path: "summary",
         element: (
           <ProtectedRoute>
             <SummaryScreen />
           </ProtectedRoute>
         ),
       },
-      { path: 'signin', element: <SignInScreen /> },
+      { path: "signin", element: <SignInScreen /> },
+      { path: "signup", element: <SignUpScreen /> },
       {
-        path: 'cashflow-plan',
+        path: "cashflow-plan",
         element: (
           <ProtectedRoute>
             <CashFlowPlanScreen />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "simulation",
+        element: (
+          <ProtectedRoute>
+            <SimulationMenuScreen />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "simulation/national-pension",
+        element: (
+          <ProtectedRoute>
+            <NationalPensionSimulationScreen />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "simulation/irp",
+        element: (
+          <ProtectedRoute>
+            <IrpSimulationScreen />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "simulation/severance-pay",
+        element: (
+          <ProtectedRoute>
+            <SeverancePaySimulationScreen />
           </ProtectedRoute>
         ),
       },

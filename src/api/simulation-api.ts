@@ -1,12 +1,18 @@
-import { isAxiosError } from 'axios';
-import z from 'zod';
-import client, { ApiError } from './client';
+import { isAxiosError } from "axios";
+import z from "zod";
+import client, { ApiError } from "./client";
 
 // 시뮬레이션 데이터 스키마
 const simulationSchema = z.object({
   id: z.number(),
   userId: z.number(),
-  type: z.enum(['HEALTH_INSURANCE', 'ISA']),
+  type: z.enum([
+    "HEALTH_INSURANCE",
+    "ISA",
+    "NATIONAL_PENSION",
+    "IRP",
+    "SEVERANCE_PAY",
+  ]),
   inputData: z.record(z.unknown()),
   outputData: z.record(z.unknown()),
   createdAt: z.string().or(z.date()),
@@ -22,60 +28,87 @@ const isaInputSchema = z.object({
   amount: z.number(),
 });
 
+// 국민연금 시뮬레이션 입력 스키마
+const nationalPensionInputSchema = z.object({
+  monthlyIncome: z.number(),
+  contributionYears: z.number(),
+  birthYear: z.number(),
+});
+
+// IRP 시뮬레이션 입력 스키마
+const irpInputSchema = z.object({
+  annualContribution: z.number(),
+  expectedReturnRate: z.number(),
+  investmentYears: z.number(),
+  annualIncome: z.number(),
+});
+
+// 퇴직금 시뮬레이션 입력 스키마
+const severancePayInputSchema = z.object({
+  averageMonthlyWage: z.number(),
+  yearsOfService: z.number(),
+});
+
 export type Simulation = z.infer<typeof simulationSchema>;
 export type HealthInsuranceInput = z.infer<typeof healthInsuranceInputSchema>;
 export type IsaInput = z.infer<typeof isaInputSchema>;
+export type NationalPensionInput = z.infer<typeof nationalPensionInputSchema>;
+export type IrpInput = z.infer<typeof irpInputSchema>;
+export type SeverancePayInput = z.infer<typeof severancePayInputSchema>;
 
 // 건강보험 시뮬레이션 생성
 export const createHealthInsuranceSimulation = async (
-  inputData: HealthInsuranceInput
+  inputData: HealthInsuranceInput,
 ): Promise<Simulation> => {
   try {
-    const res = await client.post('/simulations/health-insurance', { inputData });
+    const res = await client.post("/simulations/health-insurance", {
+      inputData,
+    });
     const parsed = simulationSchema.safeParse(res.data.data);
     if (!parsed.success) {
-      throw new Error('유효하지 않은 응답 형식입니다');
+      throw new Error("유효하지 않은 응답 형식입니다");
     }
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
     }
     throw err;
   }
 };
 
 // 최신 건강보험 시뮬레이션 조회
-export const getLatestHealthInsuranceSimulation = async (): Promise<Simulation> => {
-  try {
-    const res = await client.get('/simulations/health-insurance/latest');
-    const parsed = simulationSchema.safeParse(res.data.data);
-    if (!parsed.success) {
-      throw new Error('유효하지 않은 응답 형식입니다');
+export const getLatestHealthInsuranceSimulation =
+  async (): Promise<Simulation> => {
+    try {
+      const res = await client.get("/simulations/health-insurance/latest");
+      const parsed = simulationSchema.safeParse(res.data.data);
+      if (!parsed.success) {
+        throw new Error("유효하지 않은 응답 형식입니다");
+      }
+      return parsed.data;
+    } catch (err: unknown) {
+      if (isAxiosError(err)) {
+        throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+      }
+      throw err;
     }
-    return parsed.data;
-  } catch (err: unknown) {
-    if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
-    }
-    throw err;
-  }
-};
+  };
 
 // ISA 시뮬레이션 생성
 export const createIsaSimulation = async (
-  inputData: IsaInput
+  inputData: IsaInput,
 ): Promise<Simulation> => {
   try {
-    const res = await client.post('/simulations/isa', { inputData });
+    const res = await client.post("/simulations/isa", { inputData });
     const parsed = simulationSchema.safeParse(res.data.data);
     if (!parsed.success) {
-      throw new Error('유효하지 않은 응답 형식입니다');
+      throw new Error("유효하지 않은 응답 형식입니다");
     }
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
     }
     throw err;
   }
@@ -84,16 +117,126 @@ export const createIsaSimulation = async (
 // 최신 ISA 시뮬레이션 조회
 export const getLatestIsaSimulation = async (): Promise<Simulation> => {
   try {
-    const res = await client.get('/simulations/isa/latest');
+    const res = await client.get("/simulations/isa/latest");
     const parsed = simulationSchema.safeParse(res.data.data);
     if (!parsed.success) {
-      throw new Error('유효하지 않은 응답 형식입니다');
+      throw new Error("유효하지 않은 응답 형식입니다");
     }
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
     }
     throw err;
   }
 };
+
+// 국민연금 시뮬레이션 생성
+export const createNationalPensionSimulation = async (
+  inputData: NationalPensionInput,
+): Promise<Simulation> => {
+  try {
+    const res = await client.post("/simulations/national-pension", inputData);
+    const parsed = simulationSchema.safeParse(res.data.data);
+    if (!parsed.success) {
+      throw new Error("유효하지 않은 응답 형식입니다");
+    }
+    return parsed.data;
+  } catch (err: unknown) {
+    if (isAxiosError(err)) {
+      throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+    }
+    throw err;
+  }
+};
+
+// 최신 국민연금 시뮬레이션 조회
+export const getLatestNationalPensionSimulation =
+  async (): Promise<Simulation> => {
+    try {
+      const res = await client.get("/simulations/national-pension/latest");
+      const parsed = simulationSchema.safeParse(res.data.data);
+      if (!parsed.success) {
+        throw new Error("유효하지 않은 응답 형식입니다");
+      }
+      return parsed.data;
+    } catch (err: unknown) {
+      if (isAxiosError(err)) {
+        throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+      }
+      throw err;
+    }
+  };
+
+// IRP 시뮬레이션 생성
+export const createIrpSimulation = async (
+  inputData: IrpInput,
+): Promise<Simulation> => {
+  try {
+    const res = await client.post("/simulations/irp", inputData);
+    const parsed = simulationSchema.safeParse(res.data.data);
+    if (!parsed.success) {
+      throw new Error("유효하지 않은 응답 형식입니다");
+    }
+    return parsed.data;
+  } catch (err: unknown) {
+    if (isAxiosError(err)) {
+      throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+    }
+    throw err;
+  }
+};
+
+// 최신 IRP 시뮬레이션 조회
+export const getLatestIrpSimulation = async (): Promise<Simulation> => {
+  try {
+    const res = await client.get("/simulations/irp/latest");
+    const parsed = simulationSchema.safeParse(res.data.data);
+    if (!parsed.success) {
+      throw new Error("유효하지 않은 응답 형식입니다");
+    }
+    return parsed.data;
+  } catch (err: unknown) {
+    if (isAxiosError(err)) {
+      throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+    }
+    throw err;
+  }
+};
+
+// 퇴직금 시뮬레이션 생성
+export const createSeverancePaySimulation = async (
+  inputData: SeverancePayInput,
+): Promise<Simulation> => {
+  try {
+    const res = await client.post("/simulations/severance-pay", inputData);
+    const parsed = simulationSchema.safeParse(res.data.data);
+    if (!parsed.success) {
+      throw new Error("유효하지 않은 응답 형식입니다");
+    }
+    return parsed.data;
+  } catch (err: unknown) {
+    if (isAxiosError(err)) {
+      throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+    }
+    throw err;
+  }
+};
+
+// 최신 퇴직금 시뮬레이션 조회
+export const getLatestSeverancePaySimulation =
+  async (): Promise<Simulation> => {
+    try {
+      const res = await client.get("/simulations/severance-pay/latest");
+      const parsed = simulationSchema.safeParse(res.data.data);
+      if (!parsed.success) {
+        throw new Error("유효하지 않은 응답 형식입니다");
+      }
+      return parsed.data;
+    } catch (err: unknown) {
+      if (isAxiosError(err)) {
+        throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+      }
+      throw err;
+    }
+  };

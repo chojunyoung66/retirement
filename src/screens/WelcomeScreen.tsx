@@ -68,6 +68,12 @@ export default function WelcomeScreen() {
         </Button>
       </div>
 
+      <div className="mt-16">
+        <Button variant="secondary" onClick={() => navigate("/portfolio")}>
+          연금 포트폴리오
+        </Button>
+      </div>
+
       {saved && (
         <div className="mt-16">
           <Button variant="secondary" onClick={handleLoad}>

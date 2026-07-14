@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useSimulation } from '../hooks/useSimulation';
+import { ApiError } from '../api/client';
 
 function formatWan(won: number): string {
   return `${Math.round(won / 10000).toLocaleString('ko-KR')}만원`;
@@ -10,12 +11,24 @@ function formatWan(won: number): string {
 
 export default function IsaSimulationScreen() {
   const navigate = useNavigate();
-  const { isaSimulation, createIsa, isLoading, error } = useSimulation();
+  const { isaSimulation, createIsa, fetchLatestIsa, isLoading, error } = useSimulation();
 
   const [annualContribution, setAnnualContribution] = useState('');
   const [expectedReturnRate, setExpectedReturnRate] = useState('');
   const [investmentYears, setInvestmentYears] = useState('');
   const [formError, setFormError] = useState<string | undefined>();
+  const [loadNotice, setLoadNotice] = useState<string | undefined>();
+
+  const handleLoadLatest = async () => {
+    setLoadNotice(undefined);
+    try {
+      await fetchLatestIsa();
+    } catch (err) {
+      if (err instanceof ApiError && err.errorCode === 'ISA_SIMULATION_NOT_FOUND') {
+        setLoadNotice('저장된 결과가 없습니다');
+      }
+    }
+  };
 
   const handleSubmit = async () => {
     setFormError(undefined);
@@ -88,6 +101,16 @@ export default function IsaSimulationScreen() {
       <Button onClick={handleSubmit} disabled={isLoading}>
         {isLoading ? '계산 중...' : '계산하기'}
       </Button>
+
+      <button
+        className="btn-back"
+        style={{ marginTop: 8, width: '100%' }}
+        onClick={handleLoadLatest}
+        disabled={isLoading}
+      >
+        이전 결과 불러오기
+      </button>
+      {loadNotice && <p className="form-hint mt-4">{loadNotice}</p>}
 
       {output && (
         <div className="card mt-16">

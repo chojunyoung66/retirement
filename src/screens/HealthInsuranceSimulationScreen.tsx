@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useSimulation } from '../hooks/useSimulation';
+import { ApiError } from '../api/client';
 
 function formatWon(won: number): string {
   return won.toLocaleString('ko-KR');
@@ -10,12 +11,24 @@ function formatWon(won: number): string {
 
 export default function HealthInsuranceSimulationScreen() {
   const navigate = useNavigate();
-  const { healthInsuranceSimulation, createHealthInsurance, isLoading, error } = useSimulation();
+  const { healthInsuranceSimulation, createHealthInsurance, fetchLatestHealthInsurance, isLoading, error } = useSimulation();
 
   const [monthlyIncome, setMonthlyIncome] = useState('');
   const [propertyValue, setPropertyValue] = useState('');
   const [carValue, setCarValue] = useState('');
   const [formError, setFormError] = useState<string | undefined>();
+  const [loadNotice, setLoadNotice] = useState<string | undefined>();
+
+  const handleLoadLatest = async () => {
+    setLoadNotice(undefined);
+    try {
+      await fetchLatestHealthInsurance();
+    } catch (err) {
+      if (err instanceof ApiError && err.errorCode === 'HEALTH_INSURANCE_SIMULATION_NOT_FOUND') {
+        setLoadNotice('저장된 결과가 없습니다');
+      }
+    }
+  };
 
   const handleSubmit = async () => {
     setFormError(undefined);
@@ -80,6 +93,16 @@ export default function HealthInsuranceSimulationScreen() {
       <Button onClick={handleSubmit} disabled={isLoading}>
         {isLoading ? '계산 중...' : '계산하기'}
       </Button>
+
+      <button
+        className="btn-back"
+        style={{ marginTop: 8, width: '100%' }}
+        onClick={handleLoadLatest}
+        disabled={isLoading}
+      >
+        이전 결과 불러오기
+      </button>
+      {loadNotice && <p className="form-hint mt-4">{loadNotice}</p>}
 
       {output && (
         <div className="card mt-16">

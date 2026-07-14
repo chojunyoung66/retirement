@@ -18,9 +18,13 @@ const simulationSchema = z.object({
   createdAt: z.string().or(z.date()),
 });
 
-// 건강보험 시뮬레이션 입력 스키마
+// 건강보험 시뮬레이션 입력 스키마 (지역가입자 점수제 기준)
 const healthInsuranceInputSchema = z.object({
-  monthlyIncome: z.number(),
+  pensionIncome: z.number(),
+  laborIncome: z.number(),
+  businessIncome: z.number(),
+  interestDividendIncome: z.number(),
+  otherIncome: z.number(),
   propertyValue: z.number(),
   carValue: z.number(),
 });

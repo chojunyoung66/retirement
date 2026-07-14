@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod';
 import { useAuth } from '../hooks/useAuth';
@@ -20,6 +20,7 @@ interface LocationState {
 export default function SignInScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { login, error: authError } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -44,7 +45,8 @@ export default function SignInScreen() {
       await login(result.data);
       dispatch(showToast('로그인되었어요'));
       const state = location.state as LocationState | null;
-      navigate(state?.from ?? '/result', { replace: true });
+      const returnTo = state?.from ?? searchParams.get('returnTo') ?? '/result';
+      navigate(returnTo, { replace: true });
     } catch {
       dispatch(showToast(authError || '로그인 실패'));
     }

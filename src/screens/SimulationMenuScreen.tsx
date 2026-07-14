@@ -80,8 +80,11 @@ export default function SimulationMenuScreen() {
         </div>
       ))}
 
-      <div className="mt-16">
-        <button className="btn-back" onClick={() => navigate("/")}>
+      <div className="mt-16" style={{ display: "flex", gap: 8 }}>
+        <button className="btn-back" style={{ flex: 1 }} onClick={() => navigate("/simulation/dashboard")}>
+          전체 결과 보기
+        </button>
+        <button className="btn-back" style={{ flex: 1 }} onClick={() => navigate("/")}>
           홈으로
         </button>
       </div>

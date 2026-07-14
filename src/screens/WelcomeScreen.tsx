@@ -74,6 +74,12 @@ export default function WelcomeScreen() {
         </Button>
       </div>
 
+      <div className="mt-16">
+        <Button variant="secondary" onClick={() => navigate("/simulation/dashboard")}>
+          시뮬레이션 대시보드
+        </Button>
+      </div>
+
       {saved && (
         <div className="mt-16">
           <Button variant="secondary" onClick={handleLoad}>

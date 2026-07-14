@@ -44,6 +44,13 @@ const items: SimulationMenuItem[] = [
     path: "/simulation/severance-pay",
     badge: "신규",
   },
+  {
+    key: "unemployment-benefit",
+    title: "실업급여",
+    description: "정년퇴직 후 수령 가능한 구직급여를 계산합니다.",
+    path: "/simulation/unemployment-benefit",
+    badge: "신규",
+  },
 ];
 
 export default function SimulationMenuScreen() {

@@ -57,12 +57,20 @@ const severancePayInputSchema = z.object({
   yearsOfService: z.number(),
 });
 
+// 실업급여 시뮬레이션 입력 스키마
+const unemploymentBenefitInputSchema = z.object({
+  averageMonthlyWage: z.number(),
+  insuranceYears: z.number(),
+  age: z.number(),
+});
+
 export type Simulation = z.infer<typeof simulationSchema>;
 export type HealthInsuranceInput = z.infer<typeof healthInsuranceInputSchema>;
 export type IsaInput = z.infer<typeof isaInputSchema>;
 export type NationalPensionInput = z.infer<typeof nationalPensionInputSchema>;
 export type IrpInput = z.infer<typeof irpInputSchema>;
 export type SeverancePayInput = z.infer<typeof severancePayInputSchema>;
+export type UnemploymentBenefitInput = z.infer<typeof unemploymentBenefitInputSchema>;
 
 // 건강보험 시뮬레이션 생성
 export const createHealthInsuranceSimulation = async (
@@ -246,3 +254,31 @@ export const getLatestSeverancePaySimulation =
       throw err;
     }
   };
+
+// 실업급여 시뮬레이션 생성
+export const createUnemploymentBenefitSimulation = async (
+  inputData: UnemploymentBenefitInput,
+): Promise<Simulation> => {
+  try {
+    const res = await client.post("/simulations/unemployment-benefit", inputData);
+    const parsed = simulationSchema.safeParse(res.data.data);
+    if (!parsed.success) throw new Error("유효하지 않은 응답 형식입니다");
+    return parsed.data;
+  } catch (err: unknown) {
+    if (isAxiosError(err)) throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+    throw err;
+  }
+};
+
+// 최신 실업급여 시뮬레이션 조회
+export const getLatestUnemploymentBenefitSimulation = async (): Promise<Simulation> => {
+  try {
+    const res = await client.get("/simulations/unemployment-benefit/latest");
+    const parsed = simulationSchema.safeParse(res.data.data);
+    if (!parsed.success) throw new Error("유효하지 않은 응답 형식입니다");
+    return parsed.data;
+  } catch (err: unknown) {
+    if (isAxiosError(err)) throw new ApiError(err.response?.data?.error?.code || "UNKNOWN_ERROR");
+    throw err;
+  }
+};

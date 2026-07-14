@@ -96,6 +96,23 @@ function SimulationSummary({ simulation }: { simulation: Simulation }) {
     );
   }
 
+  if (simulation.type === "UNEMPLOYMENT_BENEFIT") {
+    const data = output as { benefitDays: number; dailyBenefit: number; totalBenefit: number; notice: string };
+    return (
+      <>
+        <div className="simulation-card">
+          <span className="simulation-label">소정급여일수</span>
+          <span className="simulation-delta">{data.benefitDays}일 (약 {Math.round(data.benefitDays / 30)}개월)</span>
+        </div>
+        <div className="simulation-card">
+          <span className="simulation-label">총 예상 수령액</span>
+          <span className="simulation-delta">{formatWan(data.totalBenefit)}</span>
+        </div>
+        <p className="form-hint mt-4">{data.notice}</p>
+      </>
+    );
+  }
+
   return null;
 }
 
@@ -105,6 +122,7 @@ const SIMULATION_META: Record<string, { label: string; path: string }> = {
   NATIONAL_PENSION: { label: "국민연금", path: "/simulation/national-pension" },
   IRP: { label: "IRP", path: "/simulation/irp" },
   SEVERANCE_PAY: { label: "퇴직금", path: "/simulation/severance-pay" },
+  UNEMPLOYMENT_BENEFIT: { label: "실업급여", path: "/simulation/unemployment-benefit" },
 };
 
 export default function SimulationDashboardScreen() {
@@ -120,6 +138,8 @@ export default function SimulationDashboardScreen() {
     fetchLatestNationalPension,
     fetchLatestIrp,
     fetchLatestSeverancePay,
+    unemploymentBenefitSimulation,
+    fetchLatestUnemploymentBenefit,
     isLoading,
   } = useSimulation();
 
@@ -131,6 +151,7 @@ export default function SimulationDashboardScreen() {
       fetchLatestNationalPension(),
       fetchLatestIrp(),
       fetchLatestSeverancePay(),
+      fetchLatestUnemploymentBenefit(),
     ]);
   }, []);
 
@@ -140,6 +161,7 @@ export default function SimulationDashboardScreen() {
     { type: "NATIONAL_PENSION", simulation: nationalPensionSimulation },
     { type: "IRP", simulation: irpSimulation },
     { type: "SEVERANCE_PAY", simulation: severancePaySimulation },
+    { type: "UNEMPLOYMENT_BENEFIT", simulation: unemploymentBenefitSimulation },
   ];
 
   const doneCount = results.filter((r) => r.simulation !== null).length;
@@ -151,7 +173,7 @@ export default function SimulationDashboardScreen() {
         <p className="hero-subtitle">
           은퇴 준비 시뮬레이션 결과를 한눈에 확인하세요.
           <br />
-          {isLoading ? "조회 중..." : `${doneCount}/5 완료`}
+          {isLoading ? "조회 중..." : `${doneCount}/6 완료`}
         </p>
       </section>
 

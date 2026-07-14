@@ -10,12 +10,15 @@ import {
   getLatestIrpSimulation,
   createSeverancePaySimulation,
   getLatestSeverancePaySimulation,
+  createUnemploymentBenefitSimulation,
+  getLatestUnemploymentBenefitSimulation,
   type Simulation,
   type HealthInsuranceInput,
   type IsaInput,
   type NationalPensionInput,
   type IrpInput,
   type SeverancePayInput,
+  type UnemploymentBenefitInput,
 } from "../api/simulation-api";
 import { ApiError } from "../api/client";
 
@@ -27,6 +30,8 @@ export function useSimulation() {
     useState<Simulation | null>(null);
   const [irpSimulation, setIrpSimulation] = useState<Simulation | null>(null);
   const [severancePaySimulation, setSeverancePaySimulation] =
+    useState<Simulation | null>(null);
+  const [unemploymentBenefitSimulation, setUnemploymentBenefitSimulation] =
     useState<Simulation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -240,12 +245,56 @@ export function useSimulation() {
     }
   }, []);
 
+  // 실업급여 시뮬레이션 생성
+  const createUnemploymentBenefit = useCallback(
+    async (inputData: UnemploymentBenefitInput) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await createUnemploymentBenefitSimulation(inputData);
+        setUnemploymentBenefitSimulation(result);
+        return result;
+      } catch (err) {
+        const message =
+          err instanceof ApiError
+            ? `생성 실패: ${err.errorCode}`
+            : "실업급여 시뮬레이션 생성 중 오류가 발생했습니다";
+        setError(message);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  // 최신 실업급여 시뮬레이션 조회
+  const fetchLatestUnemploymentBenefit = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await getLatestUnemploymentBenefitSimulation();
+      setUnemploymentBenefitSimulation(result);
+      return result;
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? `조회 실패: ${err.errorCode}`
+          : "실업급여 시뮬레이션 조회 중 오류가 발생했습니다";
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     healthInsuranceSimulation,
     isaSimulation,
     nationalPensionSimulation,
     irpSimulation,
     severancePaySimulation,
+    unemploymentBenefitSimulation,
     isLoading,
     error,
     createHealthInsurance,
@@ -258,5 +307,7 @@ export function useSimulation() {
     fetchLatestIrp,
     createSeverancePay,
     fetchLatestSeverancePay,
+    createUnemploymentBenefit,
+    fetchLatestUnemploymentBenefit,
   };
 }

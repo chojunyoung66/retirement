@@ -51,7 +51,7 @@ export const signUpRequest = async (
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -72,7 +72,7 @@ export const signInRequest = async (
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -85,7 +85,7 @@ export const getMe = async () => {
     return res.data.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }

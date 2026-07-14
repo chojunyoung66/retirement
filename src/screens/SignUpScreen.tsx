@@ -8,31 +8,34 @@ import Button from '../components/Button';
 import { showToast } from '../store/toast-slice';
 import type { AppDispatch } from '../store/store';
 
-const signInSchema = z.object({
+const signUpSchema = z.object({
+  name: z.string().min(1, { message: '이름을 입력해주세요' }),
   email: z.string().email({ message: '올바른 이메일 형식이 아니에요' }),
-  password: z.string().min(6, { message: '비밀번호는 6자 이상이어야 해요' }),
+  password: z.string().min(8, { message: '비밀번호는 8자 이상이어야 해요' }),
 });
 
 interface LocationState {
   from?: string;
 }
 
-export default function SignInScreen() {
+export default function SignUpScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, error: authError } = useAuth();
+  const { signup, error: authError } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({});
 
   const handleSubmit = async () => {
-    const result = signInSchema.safeParse({ email, password });
+    const result = signUpSchema.safeParse({ name, email, password });
     if (!result.success) {
-      const fieldErrors: { email?: string; password?: string } = {};
+      const fieldErrors: { name?: string; email?: string; password?: string } = {};
       for (const issue of result.error.issues) {
         const key = issue.path[0];
+        if (key === 'name') fieldErrors.name = issue.message;
         if (key === 'email') fieldErrors.email = issue.message;
         if (key === 'password') fieldErrors.password = issue.message;
       }
@@ -41,20 +44,28 @@ export default function SignInScreen() {
     }
 
     try {
-      await login(result.data);
-      dispatch(showToast('로그인되었어요'));
+      await signup(result.data);
+      dispatch(showToast('회원가입이 완료되었어요'));
       const state = location.state as LocationState | null;
       navigate(state?.from ?? '/result', { replace: true });
     } catch {
-      dispatch(showToast(authError || '로그인 실패'));
+      dispatch(showToast(authError || '회원가입 실패'));
     }
   };
 
   return (
     <div className="screen-content">
-      <h2 className="card-title mb-8">로그인</h2>
-      <p className="card-subtitle mb-16">결과 저장을 위해 로그인해주세요.</p>
+      <h2 className="card-title mb-8">회원가입</h2>
+      <p className="card-subtitle mb-16">결과 저장을 위해 계정을 만들어주세요.</p>
 
+      <Input
+        label="이름"
+        type="text"
+        value={name}
+        onChange={setName}
+        placeholder="홍길동"
+        error={errors.name}
+      />
       <Input
         label="이메일"
         type="text"
@@ -68,24 +79,19 @@ export default function SignInScreen() {
         type="password"
         value={password}
         onChange={setPassword}
-        placeholder="6자 이상"
+        placeholder="8자 이상"
         error={errors.password}
       />
 
       <div className="mt-16">
-        <Button onClick={handleSubmit}>로그인</Button>
+        <Button onClick={handleSubmit}>회원가입</Button>
       </div>
       <div className="mt-8">
         <Button
           variant="secondary"
-          onClick={() => navigate('/signup', { state: location.state })}
+          onClick={() => navigate('/signin', { state: location.state })}
         >
-          회원가입
-        </Button>
-      </div>
-      <div className="mt-8">
-        <Button variant="secondary" onClick={() => navigate('/')}>
-          홈으로
+          이미 계정이 있어요
         </Button>
       </div>
     </div>

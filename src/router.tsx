@@ -12,6 +12,8 @@ import SignInScreen from "./screens/SignInScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import CashFlowPlanScreen from "./screens/CashFlowPlanScreen";
 import SimulationMenuScreen from "./screens/SimulationMenuScreen";
+import HealthInsuranceSimulationScreen from "./screens/HealthInsuranceSimulationScreen";
+import IsaSimulationScreen from "./screens/IsaSimulationScreen";
 import NationalPensionSimulationScreen from "./screens/NationalPensionSimulationScreen";
 import IrpSimulationScreen from "./screens/IrpSimulationScreen";
 import SeverancePaySimulationScreen from "./screens/SeverancePaySimulationScreen";
@@ -59,6 +61,22 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <SimulationMenuScreen />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "simulation/health-insurance",
+        element: (
+          <ProtectedRoute>
+            <HealthInsuranceSimulationScreen />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "simulation/isa",
+        element: (
+          <ProtectedRoute>
+            <IsaSimulationScreen />
           </ProtectedRoute>
         ),
       },

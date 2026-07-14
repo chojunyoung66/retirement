@@ -46,7 +46,7 @@ export const createPortfolio = async (
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -63,7 +63,7 @@ export const getPortfolios = async (): Promise<Portfolio[]> => {
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -80,7 +80,7 @@ export const getPortfolio = async (id: number): Promise<Portfolio> => {
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -100,7 +100,7 @@ export const updatePortfolio = async (
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -112,7 +112,7 @@ export const deletePortfolio = async (id: number): Promise<void> => {
     await client.delete(`/pension-portfolios/${id}`);
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }

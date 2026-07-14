@@ -20,12 +20,16 @@ const simulationSchema = z.object({
 
 // 건강보험 시뮬레이션 입력 스키마
 const healthInsuranceInputSchema = z.object({
-  income: z.number(),
+  monthlyIncome: z.number(),
+  propertyValue: z.number(),
+  carValue: z.number(),
 });
 
 // ISA 시뮬레이션 입력 스키마
 const isaInputSchema = z.object({
-  amount: z.number(),
+  annualContribution: z.number(),
+  expectedReturnRate: z.number(),
+  investmentYears: z.number(),
 });
 
 // 국민연금 시뮬레이션 입력 스키마
@@ -61,9 +65,7 @@ export const createHealthInsuranceSimulation = async (
   inputData: HealthInsuranceInput,
 ): Promise<Simulation> => {
   try {
-    const res = await client.post("/simulations/health-insurance", {
-      inputData,
-    });
+    const res = await client.post("/simulations/health-insurance", inputData);
     const parsed = simulationSchema.safeParse(res.data.data);
     if (!parsed.success) {
       throw new Error("유효하지 않은 응답 형식입니다");
@@ -100,7 +102,7 @@ export const createIsaSimulation = async (
   inputData: IsaInput,
 ): Promise<Simulation> => {
   try {
-    const res = await client.post("/simulations/isa", { inputData });
+    const res = await client.post("/simulations/isa", inputData);
     const parsed = simulationSchema.safeParse(res.data.data);
     if (!parsed.success) {
       throw new Error("유효하지 않은 응답 형식입니다");

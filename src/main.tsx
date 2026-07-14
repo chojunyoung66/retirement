@@ -7,16 +7,18 @@ import { router } from './router';
 import { DiagnosisProvider } from './hooks/useDiagnosis';
 import './index.css';
 
-// MSW 초기화
-async function initializeMSW() {
-  const isDevelopment = (import.meta as any).env?.MODE === 'development';
-  if (isDevelopment) {
+// MSW는 비활성화됨 - 실제 Backend 서버 사용
+// MSW를 다시 활성화하려면: const ENABLE_MSW = true로 변경
+const ENABLE_MSW = false;
+
+async function initializeApp() {
+  if (ENABLE_MSW) {
     const { worker } = await import('./server/worker');
     await worker.start();
   }
 }
 
-initializeMSW().then(() => {
+initializeApp().then(() => {
   const rootEl = document.getElementById('root');
   if (!rootEl) throw new Error('#root element not found');
 

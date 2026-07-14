@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useDiagnosis } from '../hooks/useDiagnosis';
 import { useSavedPlan } from '../hooks/useSavedPlan';
+import { useRetirementGoal } from '../hooks/useRetirementGoal';
 import ProgressBar from '../components/ProgressBar';
 import Button from '../components/Button';
 import SummaryCard from '../components/SummaryCard';
@@ -15,6 +16,7 @@ export default function ProjectionScreen() {
   const { state, dispatch: diagnosisDispatch } = useDiagnosis();
   const dispatch = useDispatch<AppDispatch>();
   const { save } = useSavedPlan();
+  const { saveGoal, isLoading: isSaving } = useRetirementGoal();
 
   const projection = state.projection;
 
@@ -48,9 +50,28 @@ export default function ProjectionScreen() {
   const isNegative = projection.gap < 0;
   const gapLabel = isNegative ? '월 부족액' : '월 여유금액';
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // 로컬 백업 저장
     save(state);
-    dispatch(showToast('진단 결과를 저장했어요'));
+
+    // 서버 저장 (생년 정보가 있을 때만)
+    if (state.birthYear) {
+      try {
+        await saveGoal({
+          birthYear: state.birthYear,
+          retirementYear: state.birthYear + 65,
+          monthlyLivingExpense: state.livingExpense.desiredMonthly,
+          nationalPension: state.pension.national,
+          retirementAsset: state.pension.retirement,
+        });
+        dispatch(showToast('진단 결과를 서버에 저장했어요'));
+      } catch {
+        dispatch(showToast('서버 저장에 실패했어요 (로컬에는 저장됨)'));
+      }
+    } else {
+      dispatch(showToast('진단 결과를 저장했어요'));
+    }
+
     navigate('/summary');
   };
 
@@ -180,7 +201,9 @@ export default function ProjectionScreen() {
           <button className="btn-back" onClick={handleRestart}>
             다시 계산
           </button>
-          <Button onClick={handleSave}>결과 저장하기</Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? '저장 중...' : '결과 저장하기'}
+          </Button>
         </div>
       </div>
     </>

@@ -5,7 +5,6 @@ import client, { ApiError } from './client';
 // 정년 목표 데이터 스키마
 const retirementGoalSchema = z.object({
   id: z.number(),
-  userId: z.number(),
   birthYear: z.number(),
   retirementYear: z.number(),
   monthlyLivingExpense: z.number(),
@@ -42,7 +41,7 @@ export const createRetirementGoal = async (
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -51,7 +50,7 @@ export const createRetirementGoal = async (
 // 정년 목표 조회
 export const getRetirementGoal = async (): Promise<RetirementGoal> => {
   try {
-    const res = await client.get('/retirement-goals');
+    const res = await client.get('/retirement-goals/me');
     const parsed = retirementGoalSchema.safeParse(res.data.data);
     if (!parsed.success) {
       throw new Error('유효하지 않은 응답 형식입니다');
@@ -59,7 +58,7 @@ export const getRetirementGoal = async (): Promise<RetirementGoal> => {
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }
@@ -70,7 +69,7 @@ export const updateRetirementGoal = async (
   data: UpdateRetirementGoalRequest
 ): Promise<RetirementGoal> => {
   try {
-    const res = await client.patch('/retirement-goals', data);
+    const res = await client.patch('/retirement-goals/me', data);
     const parsed = retirementGoalSchema.safeParse(res.data.data);
     if (!parsed.success) {
       throw new Error('유효하지 않은 응답 형식입니다');
@@ -78,7 +77,7 @@ export const updateRetirementGoal = async (
     return parsed.data;
   } catch (err: unknown) {
     if (isAxiosError(err)) {
-      throw new ApiError(err.response?.data?.code || 'UNKNOWN_ERROR');
+      throw new ApiError(err.response?.data?.error?.code || 'UNKNOWN_ERROR');
     }
     throw err;
   }

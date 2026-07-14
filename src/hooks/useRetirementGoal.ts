@@ -82,6 +82,38 @@ export function useRetirementGoal() {
     [goal]
   );
 
+  // 정년 목표 저장 (없으면 생성, 있으면 업데이트)
+  const saveGoal = useCallback(
+    async (data: CreateRetirementGoalRequest) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        let result: RetirementGoal;
+        try {
+          await getRetirementGoal();
+          result = await updateRetirementGoal(data);
+        } catch (err) {
+          if (err instanceof ApiError && err.errorCode === 'RETIREMENT_GOAL_NOT_FOUND') {
+            result = await createRetirementGoal(data);
+          } else {
+            throw err;
+          }
+        }
+        setGoal(result);
+        return result;
+      } catch (err) {
+        const message = err instanceof ApiError
+          ? `저장 실패: ${err.errorCode}`
+          : '정년 목표 저장 중 오류가 발생했습니다';
+        setError(message);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     goal,
     isLoading,
@@ -89,5 +121,6 @@ export function useRetirementGoal() {
     fetchGoal,
     createGoal,
     updateGoal,
+    saveGoal,
   };
 }

@@ -20,14 +20,14 @@ interface LocationState {
 export default function SignInScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, error: authError } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const result = signInSchema.safeParse({ email, password });
     if (!result.success) {
       const fieldErrors: { email?: string; password?: string } = {};
@@ -39,10 +39,15 @@ export default function SignInScreen() {
       setErrors(fieldErrors);
       return;
     }
-    login(result.data.email, result.data.password);
-    dispatch(showToast('로그인되었어요'));
-    const state = location.state as LocationState | null;
-    navigate(state?.from ?? '/result', { replace: true });
+
+    try {
+      await login(result.data);
+      dispatch(showToast('로그인되었어요'));
+      const state = location.state as LocationState | null;
+      navigate(state?.from ?? '/result', { replace: true });
+    } catch {
+      dispatch(showToast(authError || '로그인 실패'));
+    }
   };
 
   return (

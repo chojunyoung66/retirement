@@ -89,6 +89,12 @@ export interface YearlyProjection {
   monthlyExpense: number;
   monthlyGap: number;
   cumulativeGap: number;
+  unemploymentBenefitIncome?: number;
+}
+
+export interface UnemploymentBenefitOption {
+  monthlyAmount: number;
+  durationMonths: number;
 }
 
 export function calculateLongTermProjection(
@@ -96,8 +102,9 @@ export function calculateLongTermProjection(
   years = 20,
   inflationRate = 0.02,
   pensionGrowthRate = 0.02,
+  unemploymentBenefit?: UnemploymentBenefitOption,
 ): YearlyProjection[] {
-  const retirementAge = 65;
+  const retirementAge = 60;
   const baseIncome =
     state.pension.national + state.pension.retirement + state.pension.personal;
   const baseExpense =
@@ -111,7 +118,16 @@ export function calculateLongTermProjection(
   for (let i = 0; i < years; i++) {
     const inflationFactor = Math.pow(1 + inflationRate, i);
     const pensionFactor = Math.pow(1 + pensionGrowthRate, i);
-    const monthlyIncome = Math.round(baseIncome * pensionFactor);
+
+    // 60세(i=0)에 실업급여를 연간 총액의 월평균으로 반영
+    const ubIncome =
+      unemploymentBenefit && i === 0
+        ? Math.round(
+            (unemploymentBenefit.monthlyAmount * unemploymentBenefit.durationMonths) / 12,
+          )
+        : 0;
+
+    const monthlyIncome = Math.round(baseIncome * pensionFactor) + ubIncome;
     const monthlyExpense = Math.round(baseExpense * inflationFactor);
     const monthlyGap = monthlyIncome - monthlyExpense;
     cumulative += monthlyGap * 12;
@@ -123,6 +139,7 @@ export function calculateLongTermProjection(
       monthlyExpense,
       monthlyGap,
       cumulativeGap: cumulative,
+      ...(ubIncome > 0 ? { unemploymentBenefitIncome: ubIncome } : {}),
     });
   }
   return result;

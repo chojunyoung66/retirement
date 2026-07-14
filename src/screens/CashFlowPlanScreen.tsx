@@ -21,10 +21,20 @@ export default function CashFlowPlanScreen() {
   const { state } = useDiagnosis();
   const [inflationRate, setInflationRate] = useState(0.02);
   const [pensionGrowthRate, setPensionGrowthRate] = useState(0.02);
+  const [includeUnemployment, setIncludeUnemployment] = useState(false);
+  const [ubMonthly, setUbMonthly] = useState('100');
+  const [ubMonths, setUbMonths] = useState('9');
+
+  const unemploymentBenefit = useMemo(() => {
+    if (!includeUnemployment) return undefined;
+    const monthly = Number(ubMonthly) * 10000;
+    const months = Math.min(12, Math.max(1, Number(ubMonths) || 9));
+    return monthly > 0 ? { monthlyAmount: monthly, durationMonths: months } : undefined;
+  }, [includeUnemployment, ubMonthly, ubMonths]);
 
   const data = useMemo(
-    () => calculateLongTermProjection(state, 20, inflationRate, pensionGrowthRate),
-    [state, inflationRate, pensionGrowthRate],
+    () => calculateLongTermProjection(state, 20, inflationRate, pensionGrowthRate, unemploymentBenefit),
+    [state, inflationRate, pensionGrowthRate, unemploymentBenefit],
   );
 
   const lastYear = data[data.length - 1];
@@ -56,7 +66,7 @@ export default function CashFlowPlanScreen() {
     <div className="screen-content">
       <div className="cfp-hero">
         <div className="cfp-hero-title">20년 현금 흐름 설계</div>
-        <div className="cfp-hero-sub">은퇴 후 65세~84세까지의 재정 흐름을 시뮬레이션합니다</div>
+        <div className="cfp-hero-sub">정년퇴직 60세~79세까지의 재정 흐름을 시뮬레이션합니다</div>
       </div>
 
       {/* 가정 설정 */}
@@ -90,6 +100,56 @@ export default function CashFlowPlanScreen() {
             ))}
           </div>
         </div>
+        <div className="cfp-assumption-row" style={{ alignItems: 'flex-start' }}>
+          <span className="cfp-assumption-label">실업급여 포함</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+            <div className="cfp-chip-group">
+              <button
+                className={`cfp-chip ${!includeUnemployment ? 'cfp-chip-active' : ''}`}
+                onClick={() => setIncludeUnemployment(false)}
+              >
+                미포함
+              </button>
+              <button
+                className={`cfp-chip ${includeUnemployment ? 'cfp-chip-active' : ''}`}
+                onClick={() => setIncludeUnemployment(true)}
+              >
+                포함
+              </button>
+            </div>
+            {includeUnemployment && (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <input
+                    type="number"
+                    value={ubMonthly}
+                    onChange={(e) => setUbMonthly(e.target.value.replace(/[^0-9]/g, ''))}
+                    style={{ width: 72, padding: '4px 8px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}
+                    placeholder="100"
+                  />
+                  <span style={{ fontSize: 13, color: '#666' }}>만원/월</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <input
+                    type="number"
+                    value={ubMonths}
+                    onChange={(e) => setUbMonths(e.target.value.replace(/[^0-9]/g, ''))}
+                    style={{ width: 52, padding: '4px 8px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}
+                    placeholder="9"
+                    min={1}
+                    max={12}
+                  />
+                  <span style={{ fontSize: 13, color: '#666' }}>개월 (60세 반영)</span>
+                </div>
+              </div>
+            )}
+            {includeUnemployment && (
+              <p style={{ fontSize: 12, color: '#888', margin: 0 }}>
+                실업급여 시뮬레이션 결과를 입력하세요. 60세 연도에 일괄 반영됩니다.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* 20년 요약 지표 */}
@@ -119,7 +179,10 @@ export default function CashFlowPlanScreen() {
             const isPos = d.cumulativeGap >= 0;
             return (
               <div key={d.year} className="cfp-chart-row">
-                <div className="cfp-chart-age">{d.age}세</div>
+                <div className="cfp-chart-age">
+                  {d.age}세
+                  {d.unemploymentBenefitIncome ? <span style={{ fontSize: 10, color: '#2196F3', marginLeft: 2 }}>실업</span> : null}
+                </div>
                 <div className="cfp-chart-track">
                   <div
                     className={`cfp-chart-fill ${isPos ? 'cfp-chart-fill-pos' : 'cfp-chart-fill-neg'}`}
@@ -150,9 +213,23 @@ export default function CashFlowPlanScreen() {
             </thead>
             <tbody>
               {data.map((d) => (
-                <tr key={d.year}>
-                  <td className="cfp-td-age">{d.age}세</td>
-                  <td>{formatWan(d.monthlyIncome)}</td>
+                <tr key={d.year} style={d.unemploymentBenefitIncome ? { backgroundColor: '#f0f8ff' } : undefined}>
+                  <td className="cfp-td-age">
+                    {d.age}세
+                    {d.unemploymentBenefitIncome ? (
+                      <span style={{ display: 'block', fontSize: 10, color: '#2196F3', fontWeight: 500 }}>
+                        실업급여 포함
+                      </span>
+                    ) : null}
+                  </td>
+                  <td>
+                    {formatWan(d.monthlyIncome)}
+                    {d.unemploymentBenefitIncome ? (
+                      <span style={{ display: 'block', fontSize: 10, color: '#2196F3' }}>
+                        (+{formatWan(d.unemploymentBenefitIncome)})
+                      </span>
+                    ) : null}
+                  </td>
                   <td>{formatWan(d.monthlyExpense)}</td>
                   <td className={d.monthlyGap >= 0 ? 'result-positive' : 'result-negative'}>
                     {d.monthlyGap >= 0 ? '+' : ''}{formatWan(d.monthlyGap)}

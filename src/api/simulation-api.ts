@@ -12,6 +12,7 @@ const simulationSchema = z.object({
     "NATIONAL_PENSION",
     "IRP",
     "SEVERANCE_PAY",
+    "UNEMPLOYMENT_BENEFIT",
   ]),
   inputData: z.record(z.unknown()),
   outputData: z.record(z.unknown()),

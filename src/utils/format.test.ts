@@ -49,19 +49,19 @@ describe('format utilities', () => {
     });
 
     it('should calculate age correctly for 2000 birth year', () => {
-      expect(formatAge(2000)).toBe(27);
+      expect(formatAge(2000)).toBe(26);
     });
 
     it('should calculate age correctly for 1990 birth year', () => {
-      expect(formatAge(1990)).toBe(37);
+      expect(formatAge(1990)).toBe(36);
     });
 
     it('should calculate age correctly for current year birth', () => {
-      expect(formatAge(2026)).toBe(1);
+      expect(formatAge(2026)).toBe(0);
     });
 
-    it('should handle edge case of age calculation using Korean age system', () => {
-      expect(formatAge(2025)).toBe(2);
+    it('should calculate age correctly for 2025 birth year', () => {
+      expect(formatAge(2025)).toBe(1);
     });
   });
 
@@ -77,24 +77,24 @@ describe('format utilities', () => {
       Date.prototype.getFullYear = originalGetFullYear;
     });
 
-    it('should return 0 for someone already at retirement age', () => {
-      expect(formatYearsToRetirement(1961)).toBe(0);
+    it('should return 0 for someone already at retirement age (60)', () => {
+      expect(formatYearsToRetirement(1966)).toBe(0);
     });
 
-    it('should return 38 for someone born in 2000', () => {
-      expect(formatYearsToRetirement(2000)).toBe(38);
+    it('should return 34 for someone born in 2000', () => {
+      expect(formatYearsToRetirement(2000)).toBe(34);
     });
 
-    it('should return 28 for someone born in 1990', () => {
-      expect(formatYearsToRetirement(1990)).toBe(28);
+    it('should return 24 for someone born in 1990', () => {
+      expect(formatYearsToRetirement(1990)).toBe(24);
     });
 
     it('should return 0 for someone past retirement age', () => {
       expect(formatYearsToRetirement(1950)).toBe(0);
     });
 
-    it('should handle edge case of turning 65', () => {
-      expect(formatYearsToRetirement(1961)).toBe(0);
+    it('should return 0 for someone exactly at retirement age (60)', () => {
+      expect(formatYearsToRetirement(1966)).toBe(0);
     });
 
     it('should return positive years for younger people', () => {

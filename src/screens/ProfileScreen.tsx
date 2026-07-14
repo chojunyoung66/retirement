@@ -43,6 +43,22 @@ export default function ProfileScreen() {
     return { age, years };
   }, [parsedBirthYear]);
 
+  const ageHint = useMemo(() => {
+    if (!ageInfo) return '1940년 ~ 2010년 사이';
+    const { age, years } = ageInfo;
+    // 은퇴/무직: 이미 정년과 무관
+    if (state.incomeStatus === 'retired') {
+      return `만 ${age}세 · 은퇴/무직 상태`;
+    }
+    // 재직 중 / 자영업: 정년(60세) 기준 안내
+    if (state.incomeStatus === 'employed' || state.incomeStatus === 'self-employed') {
+      if (age >= 60) return `만 ${age}세 · 정년(60세) 도달`;
+      return `만 ${age}세 · 정년(60세)까지 ${years}년`;
+    }
+    // 소득 상태 미선택: 나이만 표시
+    return `만 ${age}세`;
+  }, [ageInfo, state.incomeStatus]);
+
   const handleBirthYear = (value: string) => {
     setBirthYearInput(value.replace(/[^0-9]/g, '').slice(0, 4));
   };
@@ -88,11 +104,7 @@ export default function ProfileScreen() {
           placeholder="예: 1970"
           suffix="년"
           error={errors.birthYear}
-          hint={
-            ageInfo
-              ? `만 ${ageInfo.age}세 · 정년(65세)까지 ${ageInfo.years}년`
-              : '1940년 ~ 2010년 사이'
-          }
+          hint={ageHint}
         />
 
         <div className="form-group">

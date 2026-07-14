@@ -5,11 +5,11 @@ export function formatWan(amount: number): string {
 }
 
 export function formatAge(birthYear: number): number {
-  return new Date().getFullYear() - birthYear + 1;
+  return new Date().getFullYear() - birthYear;
 }
 
 export function formatYearsToRetirement(birthYear: number): number {
-  const retirementAge = 65;
+  const retirementAge = 60;
   const currentAge = formatAge(birthYear);
   return Math.max(0, retirementAge - currentAge);
 }

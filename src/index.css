@@ -520,6 +520,12 @@ button {
   font-weight: 600;
   color: var(--text-primary);
 }
+.item-row-value.result-positive {
+  color: var(--success);
+}
+.item-row-value.result-negative {
+  color: var(--danger);
+}
 
 .simulation-card {
   background: var(--primary-light);

@@ -6,7 +6,6 @@ import {
   type ReactNode,
 } from 'react';
 import type { DiagnosisState } from '../domain/plan';
-import { setLocalStorage } from '../utils/local-storage';
 import { calculateProjection } from '../service/retirement-service';
 
 const initialState: DiagnosisState = {
@@ -28,23 +27,16 @@ type Action =
 
 function reducer(state: DiagnosisState, action: Action): DiagnosisState {
   switch (action.type) {
-    case 'UPDATE': {
-      const next = { ...state, ...action.payload };
-      setLocalStorage('retirement_plan', next);
-      return next;
-    }
+    case 'UPDATE':
+      return { ...state, ...action.payload };
     case 'CALCULATE': {
       const projection = calculateProjection(state);
-      const next = { ...state, projection };
-      setLocalStorage('retirement_plan', next);
-      return next;
+      return { ...state, projection };
     }
     case 'UPDATE_AND_CALCULATE': {
       const updated = { ...state, ...action.payload };
       const projection = calculateProjection(updated);
-      const next = { ...updated, projection };
-      setLocalStorage('retirement_plan', next);
-      return next;
+      return { ...updated, projection };
     }
     case 'RESET':
       return initialState;

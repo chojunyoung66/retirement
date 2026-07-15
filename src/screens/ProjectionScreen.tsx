@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useDiagnosis } from '../hooks/useDiagnosis';
-import { useSavedPlan } from '../hooks/useSavedPlan';
 import { useRetirementGoal } from '../hooks/useRetirementGoal';
 import { calculateLongTermProjection } from '../service/retirement-service';
 import Button from '../components/Button';
@@ -15,7 +14,6 @@ export default function ProjectionScreen() {
   const navigate = useNavigate();
   const { state } = useDiagnosis();
   const dispatch = useDispatch<AppDispatch>();
-  const { save } = useSavedPlan();
   const { saveGoal, isLoading: isSaving } = useRetirementGoal();
 
   const projection = state.projection;
@@ -59,10 +57,6 @@ export default function ProjectionScreen() {
   const gapLabel = isNegative ? '월 부족액' : '월 여유금액';
 
   const handleSave = async () => {
-    // 로컬 백업 저장
-    save(state);
-
-    // 서버 저장 (생년 정보가 있을 때만)
     if (state.birthYear) {
       try {
         await saveGoal({

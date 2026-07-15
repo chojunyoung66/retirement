@@ -1,15 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { getWelcomeMetrics } from "../service/retirement-service";
-import { useSavedPlan } from "../hooks/useSavedPlan";
 import { useDiagnosis } from "../hooks/useDiagnosis";
 import Button from "../components/Button";
 
 export default function WelcomeScreen() {
   const navigate = useNavigate();
   const metrics = getWelcomeMetrics();
-  const { load } = useSavedPlan();
   const { dispatch } = useDiagnosis();
-  const saved = load();
 
   const formatAvg = (won: number) => `${Math.round(won / 10000)}만원`;
   const formatCount = (n: number) => `${(n / 10000).toFixed(0)}만명`;
@@ -17,13 +14,6 @@ export default function WelcomeScreen() {
   const handleStart = () => {
     dispatch({ type: "RESET" });
     navigate("/diagnosis");
-  };
-
-  const handleLoad = () => {
-    if (saved) {
-      dispatch({ type: "UPDATE", payload: saved });
-      navigate("/result");
-    }
   };
 
   return (
@@ -79,14 +69,6 @@ export default function WelcomeScreen() {
           시뮬레이션 대시보드
         </Button>
       </div>
-
-      {saved && (
-        <div className="mt-16">
-          <Button variant="secondary" onClick={handleLoad}>
-            이전 결과 불러오기
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

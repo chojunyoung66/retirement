@@ -31,6 +31,7 @@ export interface CauseItem {
 export interface SimulationItem {
   label: string;
   delta: number;
+  twentyYearImpact?: number;
 }
 
 export interface ProjectionResult {

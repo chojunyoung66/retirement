@@ -65,12 +65,6 @@ export function calculateProjection(state: DiagnosisState): ProjectionResult {
         ]
       : [];
 
-  const simulations = [
-    { label: '생활비 30만원 ↓', delta: 300000 },
-    { label: '연금 수입 30만원 ↑', delta: 300000 },
-    { label: '보험료 10만원 ↓', delta: 100000 },
-  ];
-
   return {
     totalIncome,
     totalExpense,
@@ -78,7 +72,7 @@ export function calculateProjection(state: DiagnosisState): ProjectionResult {
     incomeItems,
     expenseItems,
     causeAnalysis,
-    simulations,
+    simulations: [],
   };
 }
 
@@ -165,4 +159,61 @@ export function calculateLongTermProjection(
     });
   }
   return result;
+}
+
+export function generateRecommendations(
+  state: DiagnosisState,
+  twentyYearGap: number,
+): import('../domain/plan').SimulationItem[] {
+  const MONTHS = 240;
+  const totalIncome =
+    state.pension.national + state.pension.retirement + state.pension.personal;
+  const totalInsurance =
+    state.medicalExpense.healthInsurance + state.medicalExpense.privateInsurance;
+  const { desiredMonthly } = state.livingExpense;
+
+  const isDeficit = twentyYearGap < 0;
+  // 20년 갭을 월 단위로 환산 — 이 만큼을 월별로 개선해야 균형 달성
+  const monthlyTarget = Math.abs(twentyYearGap) / MONTHS;
+  // 5만원 단위로 올림, 최소 5만원
+  const snap = (n: number) => Math.max(50000, Math.ceil(n / 50000) * 50000);
+  const wan = (n: number) => Math.round(n / 10000);
+
+  const items: import('../domain/plan').SimulationItem[] = [];
+
+  // 생활비 절감 (적자 시: 갭의 50%를 생활비로 메움, 최대 25% 절감)
+  if (desiredMonthly > 0) {
+    const delta = isDeficit
+      ? snap(Math.min(monthlyTarget * 0.5, desiredMonthly * 0.25))
+      : snap(desiredMonthly * 0.1);
+    items.push({
+      label: isDeficit ? `생활비 월 ${wan(delta)}만원 절감` : `생활비 월 ${wan(delta)}만원 절감 가능`,
+      delta,
+      twentyYearImpact: delta * MONTHS,
+    });
+  }
+
+  // 연금 수입 증가 (적자 시: 갭의 50%를 연금으로 메움, 최대 30% 증가)
+  if (totalIncome > 0) {
+    const delta = isDeficit
+      ? snap(Math.min(monthlyTarget * 0.5, totalIncome * 0.3))
+      : snap(totalIncome * 0.1);
+    items.push({
+      label: isDeficit ? `연금 수입 월 ${wan(delta)}만원 증가` : `연금 수입 월 ${wan(delta)}만원 추가 여력`,
+      delta,
+      twentyYearImpact: delta * MONTHS,
+    });
+  }
+
+  // 보험료 절감 (보험료가 있을 때만, 15% 절감 목표)
+  if (totalInsurance > 0) {
+    const delta = snap(Math.min(totalInsurance * 0.15, 200000));
+    items.push({
+      label: `보험료 월 ${wan(delta)}만원 절감`,
+      delta,
+      twentyYearImpact: delta * MONTHS,
+    });
+  }
+
+  return items;
 }

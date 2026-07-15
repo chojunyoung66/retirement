@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useDiagnosis } from '../hooks/useDiagnosis';
 import { useRetirementGoal } from '../hooks/useRetirementGoal';
-import { calculateLongTermProjection } from '../service/retirement-service';
+import { calculateLongTermProjection, generateRecommendations } from '../service/retirement-service';
 import Button from '../components/Button';
 import SummaryCard from '../components/SummaryCard';
 import { formatWan } from '../utils/format';
@@ -26,6 +26,11 @@ export default function ProjectionScreen() {
     const totalGap = totalIncome - totalExpense;
     return { totalIncome, totalExpense, totalGap };
   }, [state, projection]);
+
+  const recommendations = useMemo(() => {
+    if (!longTermSummary) return [];
+    return generateRecommendations(state, longTermSummary.totalGap);
+  }, [state, longTermSummary]);
 
   const chartValues = useMemo(() => {
     if (!projection) return null;
@@ -170,13 +175,27 @@ export default function ProjectionScreen() {
           </div>
         )}
 
-        {projection.simulations.length > 0 && (
+        {recommendations.length > 0 && (
           <div className="card">
             <div className="card-title">개선 시뮬레이션</div>
-            {projection.simulations.map((sim) => (
+            {longTermSummary && (
+              <div className={`sim-target-banner ${longTermSummary.totalGap < 0 ? 'sim-target-banner-neg' : 'sim-target-banner-pos'}`}>
+                {longTermSummary.totalGap < 0
+                  ? `20년간 ${formatWan(Math.abs(longTermSummary.totalGap))} 부족 · 매월 ${formatWan(Math.round(Math.abs(longTermSummary.totalGap) / 240))} 개선 필요`
+                  : `20년간 ${formatWan(longTermSummary.totalGap)} 여유 · 현재 계획 양호`}
+              </div>
+            )}
+            {recommendations.map((sim) => (
               <div key={sim.label} className="simulation-card">
                 <span className="simulation-label">{sim.label}</span>
-                <span className="simulation-delta">+{formatWan(sim.delta)}</span>
+                <div style={{ textAlign: 'right' }}>
+                  <div className="simulation-delta">+{formatWan(sim.delta)}/월</div>
+                  {sim.twentyYearImpact && (
+                    <div style={{ fontSize: 11, color: 'var(--success)', marginTop: 2 }}>
+                      20년 누적 +{formatWan(sim.twentyYearImpact)}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>

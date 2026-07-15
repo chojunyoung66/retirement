@@ -70,9 +70,6 @@ export default function MedicalExpenseScreen() {
         />
 
         <div className="button-row">
-          <button className="btn-back" onClick={() => navigate('/scenario')}>
-            뒤로
-          </button>
           <Button onClick={handleNext}>결과 보기</Button>
         </div>
       </div>

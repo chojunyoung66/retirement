@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import { useSimulation } from '../hooks/useSimulation';
 import { ApiError } from '../api/client';
@@ -39,7 +38,6 @@ function WonInput({
 }
 
 export default function HealthInsuranceSimulationScreen() {
-  const navigate = useNavigate();
   const { healthInsuranceSimulation, createHealthInsurance, fetchLatestHealthInsurance, isLoading, error } = useSimulation();
 
   const [pensionIncome, setPensionIncome] = useState('');
@@ -228,9 +226,6 @@ export default function HealthInsuranceSimulationScreen() {
         </div>
       )}
 
-      <div className="mt-16">
-        <button className="btn-back" onClick={() => navigate('/simulation')}>뒤로</button>
-      </div>
     </div>
   );
 }

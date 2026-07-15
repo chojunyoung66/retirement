@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useSimulation } from '../hooks/useSimulation';
@@ -10,7 +9,6 @@ function formatWan(won: number): string {
 }
 
 export default function IsaSimulationScreen() {
-  const navigate = useNavigate();
   const { isaSimulation, createIsa, fetchLatestIsa, isLoading, error } = useSimulation();
 
   const [annualContribution, setAnnualContribution] = useState('');
@@ -127,11 +125,6 @@ export default function IsaSimulationScreen() {
         </div>
       )}
 
-      <div className="mt-16">
-        <button className="btn-back" onClick={() => navigate('/simulation')}>
-          뒤로
-        </button>
-      </div>
     </div>
   );
 }

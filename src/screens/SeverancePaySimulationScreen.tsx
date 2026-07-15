@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { useSimulation } from "../hooks/useSimulation";
@@ -10,7 +9,6 @@ function formatWan(won: number): string {
 }
 
 export default function SeverancePaySimulationScreen() {
-  const navigate = useNavigate();
   const { severancePaySimulation, createSeverancePay, fetchLatestSeverancePay, isLoading, error } =
     useSimulation();
 
@@ -131,11 +129,6 @@ export default function SeverancePaySimulationScreen() {
         </div>
       )}
 
-      <div className="mt-16">
-        <button className="btn-back" onClick={() => navigate("/simulation")}>
-          뒤로
-        </button>
-      </div>
     </div>
   );
 }

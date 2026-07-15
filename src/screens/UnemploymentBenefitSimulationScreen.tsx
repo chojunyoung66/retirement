@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { useSimulation } from "../hooks/useSimulation";
@@ -14,7 +13,6 @@ function formatWan(won: number): string {
 }
 
 export default function UnemploymentBenefitSimulationScreen() {
-  const navigate = useNavigate();
   const {
     unemploymentBenefitSimulation,
     createUnemploymentBenefit,
@@ -155,9 +153,6 @@ export default function UnemploymentBenefitSimulationScreen() {
         </div>
       )}
 
-      <div className="mt-16">
-        <button className="btn-back" onClick={() => navigate("/simulation")}>뒤로</button>
-      </div>
     </div>
   );
 }

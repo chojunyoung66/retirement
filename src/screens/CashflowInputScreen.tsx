@@ -86,9 +86,6 @@ export default function CashflowInputScreen() {
         />
 
         <div className="button-row">
-          <button className="btn-back" onClick={() => navigate('/profile')}>
-            뒤로
-          </button>
           <Button onClick={handleNext}>다음</Button>
         </div>
       </div>

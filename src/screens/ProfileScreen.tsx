@@ -135,9 +135,6 @@ export default function ProfileScreen() {
         )}
 
         <div className="button-row">
-          <button className="btn-back" onClick={() => navigate('/diagnosis')}>
-            뒤로
-          </button>
           <Button onClick={handleNext}>다음</Button>
         </div>
       </div>

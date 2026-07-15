@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { useSimulation } from "../hooks/useSimulation";
@@ -14,7 +13,6 @@ function formatWan(won: number): string {
 }
 
 export default function IrpSimulationScreen() {
-  const navigate = useNavigate();
   const { irpSimulation, createIrp, fetchLatestIrp, isLoading, error } = useSimulation();
 
   const [annualContribution, setAnnualContribution] = useState("");
@@ -164,11 +162,6 @@ export default function IrpSimulationScreen() {
         </div>
       )}
 
-      <div className="mt-16">
-        <button className="btn-back" onClick={() => navigate("/simulation")}>
-          뒤로
-        </button>
-      </div>
     </div>
   );
 }

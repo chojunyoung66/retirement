@@ -36,9 +36,6 @@ export default function DiagnosisTypeScreen() {
         </div>
 
         <div className="button-row">
-          <button className="btn-back" onClick={() => navigate('/')}>
-            뒤로
-          </button>
           <Button onClick={() => navigate('/profile')}>다음</Button>
         </div>
       </div>

@@ -21,7 +21,7 @@ export default function CashFlowPlanScreen() {
   const { state } = useDiagnosis();
   const [inflationRate, setInflationRate] = useState(0.02);
   const [pensionGrowthRate, setPensionGrowthRate] = useState(0.02);
-  const [includeUnemployment, setIncludeUnemployment] = useState(true);
+  const [includeUnemployment, setIncludeUnemployment] = useState(false);
   const [ubMonthly, setUbMonthly] = useState('198');
   const [ubMonths, setUbMonths] = useState('9');
 

@@ -21,7 +21,7 @@ export default function CashFlowPlanScreen() {
   const { state } = useDiagnosis();
   const [inflationRate, setInflationRate] = useState(0.02);
   const [pensionGrowthRate, setPensionGrowthRate] = useState(0.02);
-  const [includeUnemployment, setIncludeUnemployment] = useState(false);
+  const [includeUnemployment, setIncludeUnemployment] = useState(true);
   const [ubMonthly, setUbMonthly] = useState('100');
   const [ubMonths, setUbMonths] = useState('9');
 
@@ -100,56 +100,52 @@ export default function CashFlowPlanScreen() {
             ))}
           </div>
         </div>
-        <div className="cfp-assumption-row" style={{ alignItems: 'flex-start' }}>
-          <span className="cfp-assumption-label">실업급여 포함</span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-            <div className="cfp-chip-group">
-              <button
-                className={`cfp-chip ${!includeUnemployment ? 'cfp-chip-active' : ''}`}
-                onClick={() => setIncludeUnemployment(false)}
-              >
-                미포함
-              </button>
-              <button
-                className={`cfp-chip ${includeUnemployment ? 'cfp-chip-active' : ''}`}
-                onClick={() => setIncludeUnemployment(true)}
-              >
-                포함
-              </button>
-            </div>
-            {includeUnemployment && (
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <input
-                    type="number"
-                    value={ubMonthly}
-                    onChange={(e) => setUbMonthly(e.target.value.replace(/[^0-9]/g, ''))}
-                    style={{ width: 72, padding: '4px 8px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}
-                    placeholder="100"
-                  />
-                  <span style={{ fontSize: 13, color: '#666' }}>만원/월</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <input
-                    type="number"
-                    value={ubMonths}
-                    onChange={(e) => setUbMonths(e.target.value.replace(/[^0-9]/g, ''))}
-                    style={{ width: 52, padding: '4px 8px', border: '1px solid #ddd', borderRadius: 6, fontSize: 14 }}
-                    placeholder="9"
-                    min={1}
-                    max={12}
-                  />
-                  <span style={{ fontSize: 13, color: '#666' }}>개월 (60세 반영)</span>
-                </div>
-              </div>
-            )}
-            {includeUnemployment && (
-              <p style={{ fontSize: 12, color: '#888', margin: 0 }}>
-                실업급여 시뮬레이션 결과를 입력하세요. 60세 연도에 일괄 반영됩니다.
-              </p>
-            )}
+        <div className="cfp-assumption-row">
+          <span className="cfp-assumption-label">실업급여</span>
+          <div className="cfp-chip-group">
+            <button
+              className={`cfp-chip ${!includeUnemployment ? 'cfp-chip-active' : ''}`}
+              onClick={() => setIncludeUnemployment(false)}
+            >
+              미포함
+            </button>
+            <button
+              className={`cfp-chip ${includeUnemployment ? 'cfp-chip-active' : ''}`}
+              onClick={() => setIncludeUnemployment(true)}
+            >
+              포함
+            </button>
           </div>
         </div>
+        {includeUnemployment && (
+          <div className="cfp-ub-extra">
+            <div className="cfp-ub-inputs">
+              <div className="cfp-ub-field">
+                <input
+                  type="number"
+                  value={ubMonthly}
+                  onChange={(e) => setUbMonthly(e.target.value.replace(/[^0-9]/g, ''))}
+                  className="cfp-ub-input"
+                  placeholder="100"
+                />
+                <span className="cfp-ub-unit">만원/월</span>
+              </div>
+              <div className="cfp-ub-field">
+                <input
+                  type="number"
+                  value={ubMonths}
+                  onChange={(e) => setUbMonths(e.target.value.replace(/[^0-9]/g, ''))}
+                  className="cfp-ub-input cfp-ub-input-sm"
+                  placeholder="9"
+                  min={1}
+                  max={12}
+                />
+                <span className="cfp-ub-unit">개월 (60세 반영)</span>
+              </div>
+            </div>
+            <p className="cfp-ub-hint">실업급여 시뮬레이션 결과를 입력하세요. 60세 연도에 일괄 반영됩니다.</p>
+          </div>
+        )}
       </div>
 
       {/* 20년 요약 지표 */}

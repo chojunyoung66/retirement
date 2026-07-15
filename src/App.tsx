@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useAuth } from './hooks/useAuth';
@@ -11,6 +12,10 @@ export default function App() {
   const location = useLocation();
   const { isLoggedIn, logout } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const handleAuthClick = () => {
     if (isLoggedIn) {

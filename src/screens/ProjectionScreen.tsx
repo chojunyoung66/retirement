@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { useDiagnosis } from '../hooks/useDiagnosis';
 import { useSavedPlan } from '../hooks/useSavedPlan';
 import { useRetirementGoal } from '../hooks/useRetirementGoal';
-import ProgressBar from '../components/ProgressBar';
 import Button from '../components/Button';
 import SummaryCard from '../components/SummaryCard';
 import { formatWan } from '../utils/format';
@@ -33,7 +32,6 @@ export default function ProjectionScreen() {
   if (!projection || !chartValues) {
     return (
       <>
-        <ProgressBar progress={100} />
         <div className="screen-content">
           <div className="card">
             <div className="card-title">진단 데이터가 없습니다</div>
@@ -82,7 +80,6 @@ export default function ProjectionScreen() {
 
   return (
     <>
-      <ProgressBar progress={100} />
       <div className="screen-content">
         <div className="big-gap">
           <div className="big-gap-label">{gapLabel}</div>

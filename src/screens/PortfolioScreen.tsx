@@ -52,7 +52,8 @@ function ItemEditor({
               type="number"
               placeholder="비중(%)"
               value={item.allocation || ""}
-              onChange={(e) => updateItem(i, "allocation", Number(e.target.value))}
+              onChange={(e) => updateItem(i, "allocation", Number(e.target.value.replace(/[^0-9]/g, '')))}
+              onKeyDown={(e) => { if (['-', '+', 'e', 'E'].includes(e.key)) e.preventDefault(); }}
               style={{ flex: 1 }}
             />
             <button

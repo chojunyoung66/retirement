@@ -83,6 +83,7 @@ export default function NationalPensionSimulationScreen() {
         onChange={(v) => setMonthlyIncome(v.replace(/[^0-9]/g, ""))}
         placeholder="예: 300"
         suffix="만원"
+        max={1000}
       />
       <Input
         label="가입 기간"

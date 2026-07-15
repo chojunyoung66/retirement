@@ -7,6 +7,7 @@ interface InputProps {
   suffix?: string;
   error?: string;
   hint?: string;
+  max?: number;
 }
 
 export default function Input({
@@ -18,6 +19,7 @@ export default function Input({
   suffix,
   error,
   hint,
+  max,
 }: InputProps) {
   return (
     <div className="form-group">
@@ -25,11 +27,19 @@ export default function Input({
       <div className="form-input-wrap">
         <input
           className={`form-input${suffix ? ' has-suffix' : ''}`}
-          type={type}
+          type={type === 'number' ? 'text' : type}
+          inputMode={type === 'number' ? 'numeric' : undefined}
           value={value}
           placeholder={placeholder}
-          onChange={(e) => onChange(e.target.value)}
-          inputMode={type === 'number' ? 'numeric' : 'text'}
+          onChange={(e) => {
+            let val = type === 'number'
+              ? e.target.value.replace(/[^0-9]/g, '')
+              : e.target.value;
+            if (max !== undefined && val !== '' && Number(val) > max) {
+              val = String(max);
+            }
+            onChange(val);
+          }}
         />
         {suffix && <span className="input-suffix">{suffix}</span>}
       </div>

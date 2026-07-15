@@ -27,8 +27,13 @@ function WonInput({
           className="input"
           type="number"
           value={value}
-          onChange={(e) => onChange(e.target.value.replace(/[^0-9]/g, ''))}
+          onChange={(e) => {
+            const v = e.target.value.replace(/[^0-9]/g, '');
+            onChange(Number(v) > 1000 ? '1000' : v);
+          }}
+          onKeyDown={(e) => { if (['-', '+', 'e', 'E'].includes(e.key)) e.preventDefault(); }}
           placeholder="0"
+          max={1000}
           style={{ flex: 1 }}
         />
         <span style={{ whiteSpace: 'nowrap', color: '#666' }}>만원/년</span>

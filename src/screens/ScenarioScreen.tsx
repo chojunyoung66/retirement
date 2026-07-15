@@ -81,6 +81,7 @@ export default function ScenarioScreen() {
           onChange={(v) => setDesired(v.replace(/[^0-9]/g, ''))}
           placeholder="예: 250"
           suffix="만원"
+          max={1000}
           error={error}
         />
 

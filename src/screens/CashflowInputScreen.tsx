@@ -63,26 +63,32 @@ export default function CashflowInputScreen() {
           label="국민연금 (필수)"
           type="number"
           value={national}
-          onChange={(v) => setNational(v.replace(/[^0-9]/g, ''))}
+          onChange={setNational}
           placeholder="예: 120"
           suffix="만원"
+          max={1000}
+          hint="숫자만 입력 · 최대 1,000만원"
           error={error}
         />
         <Input
           label="퇴직연금 (선택)"
           type="number"
           value={retirement}
-          onChange={(v) => setRetirement(v.replace(/[^0-9]/g, ''))}
+          onChange={setRetirement}
           placeholder="예: 50"
           suffix="만원"
+          max={1000}
+          hint="숫자만 입력 · 최대 1,000만원"
         />
         <Input
           label="개인연금 (선택)"
           type="number"
           value={personal}
-          onChange={(v) => setPersonal(v.replace(/[^0-9]/g, ''))}
+          onChange={setPersonal}
           placeholder="예: 30"
           suffix="만원"
+          max={1000}
+          hint="숫자만 입력 · 최대 1,000만원"
         />
 
         <div className="button-row">

@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useDiagnosis } from '../hooks/useDiagnosis';
 import { useSavedPlan } from '../hooks/useSavedPlan';
 import { useRetirementGoal } from '../hooks/useRetirementGoal';
+import { calculateLongTermProjection } from '../service/retirement-service';
 import Button from '../components/Button';
 import SummaryCard from '../components/SummaryCard';
 import { formatWan } from '../utils/format';
@@ -12,12 +13,21 @@ import type { AppDispatch } from '../store/store';
 
 export default function ProjectionScreen() {
   const navigate = useNavigate();
-  const { state, dispatch: diagnosisDispatch } = useDiagnosis();
+  const { state } = useDiagnosis();
   const dispatch = useDispatch<AppDispatch>();
   const { save } = useSavedPlan();
   const { saveGoal, isLoading: isSaving } = useRetirementGoal();
 
   const projection = state.projection;
+
+  const longTermSummary = useMemo(() => {
+    if (!projection) return null;
+    const data = calculateLongTermProjection(state, 20);
+    const totalIncome = data.reduce((s, d) => s + d.monthlyIncome * 12, 0);
+    const totalExpense = data.reduce((s, d) => s + d.monthlyExpense * 12, 0);
+    const totalGap = totalIncome - totalExpense;
+    return { totalIncome, totalExpense, totalGap };
+  }, [state, projection]);
 
   const chartValues = useMemo(() => {
     if (!projection) return null;
@@ -71,11 +81,6 @@ export default function ProjectionScreen() {
     }
 
     navigate('/summary');
-  };
-
-  const handleRestart = () => {
-    diagnosisDispatch({ type: 'RESET' });
-    navigate('/diagnosis');
   };
 
   return (
@@ -171,15 +176,28 @@ export default function ProjectionScreen() {
           </div>
         )}
 
-        <div className="card">
-          <div className="card-title">개선 시뮬레이션</div>
-          {projection.simulations.map((sim) => (
-            <div key={sim.label} className="simulation-card">
-              <span className="simulation-label">{sim.label}</span>
-              <span className="simulation-delta">+{formatWan(sim.delta)}</span>
+        {longTermSummary && (
+          <div className="card">
+            <div className="card-title">20년 총 현금흐름 요약</div>
+            <div className="card-subtitle" style={{ marginBottom: 12 }}>60~79세 · 기본 가정(물가 2%, 연금 2%) 기준</div>
+            <div className="item-row">
+              <span className="item-row-label">20년 수입 합계</span>
+              <span className="item-row-value result-positive">+{formatWan(longTermSummary.totalIncome)}</span>
             </div>
-          ))}
-        </div>
+            <div className="item-row">
+              <span className="item-row-label">20년 지출 합계</span>
+              <span className="item-row-value result-negative">-{formatWan(longTermSummary.totalExpense)}</span>
+            </div>
+            <div className="item-row" style={{ borderTop: '1px solid var(--border)', paddingTop: 10, marginTop: 4 }}>
+              <span className="item-row-label" style={{ fontWeight: 700 }}>
+                {longTermSummary.totalGap >= 0 ? '20년 여유 합계' : '20년 부족 합계'}
+              </span>
+              <span className={`item-row-value ${longTermSummary.totalGap >= 0 ? 'result-positive' : 'result-negative'}`} style={{ fontWeight: 700, fontSize: '1.05rem' }}>
+                {longTermSummary.totalGap >= 0 ? '+' : '-'}{formatWan(Math.abs(longTermSummary.totalGap))}
+              </span>
+            </div>
+          </div>
+        )}
 
         <SummaryCard
           label="가구 유형"
@@ -195,9 +213,6 @@ export default function ProjectionScreen() {
         </button>
 
         <div className="button-row">
-          <button className="btn-back" onClick={handleRestart}>
-            다시 계산
-          </button>
           <Button onClick={handleSave} disabled={isSaving}>
             {isSaving ? '저장 중...' : '결과 저장하기'}
           </Button>

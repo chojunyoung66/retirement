@@ -95,6 +95,7 @@ export default function UnemploymentBenefitSimulationScreen() {
         onChange={(v) => setAverageMonthlyWage(v.replace(/[^0-9]/g, ""))}
         placeholder="예: 400"
         suffix="만원"
+        max={1000}
       />
       <Input
         label="고용보험 가입 기간"

@@ -77,6 +77,7 @@ export default function SeverancePaySimulationScreen() {
         onChange={(v) => setAverageMonthlyWage(v.replace(/[^0-9]/g, ""))}
         placeholder="예: 400"
         suffix="만원"
+        max={1000}
       />
       <Input
         label="근속연수"

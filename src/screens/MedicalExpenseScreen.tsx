@@ -58,6 +58,7 @@ export default function MedicalExpenseScreen() {
           onChange={(v) => setHealth(v.replace(/[^0-9]/g, ''))}
           placeholder="예: 15"
           suffix="만원"
+          max={1000}
           error={error}
         />
         <Input
@@ -67,6 +68,7 @@ export default function MedicalExpenseScreen() {
           onChange={(v) => setPrivateIns(v.replace(/[^0-9]/g, ''))}
           placeholder="예: 20"
           suffix="만원"
+          max={1000}
         />
 
         <div className="button-row">

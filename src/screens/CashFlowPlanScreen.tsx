@@ -22,13 +22,13 @@ export default function CashFlowPlanScreen() {
   const [inflationRate, setInflationRate] = useState(0.02);
   const [pensionGrowthRate, setPensionGrowthRate] = useState(0.02);
   const [includeUnemployment, setIncludeUnemployment] = useState(true);
-  const [ubMonthly, setUbMonthly] = useState('100');
+  const [ubMonthly, setUbMonthly] = useState('198');
   const [ubMonths, setUbMonths] = useState('9');
 
   const unemploymentBenefit = useMemo(() => {
     if (!includeUnemployment) return undefined;
     const monthly = Number(ubMonthly) * 10000;
-    const months = Math.min(12, Math.max(1, Number(ubMonths) || 9));
+    const months = Math.min(9, Math.max(1, Number(ubMonths) || 9));
     return monthly > 0 ? { monthlyAmount: monthly, durationMonths: months } : undefined;
   }, [includeUnemployment, ubMonthly, ubMonths]);
 
@@ -124,23 +124,32 @@ export default function CashFlowPlanScreen() {
                 <input
                   type="number"
                   value={ubMonthly}
-                  onChange={(e) => setUbMonthly(e.target.value.replace(/[^0-9]/g, ''))}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^0-9]/g, '');
+                    setUbMonthly(Number(v) > 198 ? '198' : v);
+                  }}
+                  onKeyDown={(e) => { if (['-', '+', 'e', 'E'].includes(e.key)) e.preventDefault(); }}
                   className="cfp-ub-input"
-                  placeholder="100"
+                  placeholder="198"
+                  max={198}
                 />
-                <span className="cfp-ub-unit">만원/월</span>
+                <span className="cfp-ub-unit">만원/월 (최대 198)</span>
               </div>
               <div className="cfp-ub-field">
                 <input
                   type="number"
                   value={ubMonths}
-                  onChange={(e) => setUbMonths(e.target.value.replace(/[^0-9]/g, ''))}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^0-9]/g, '');
+                    setUbMonths(Number(v) > 9 ? '9' : v);
+                  }}
+                  onKeyDown={(e) => { if (['-', '+', 'e', 'E'].includes(e.key)) e.preventDefault(); }}
                   className="cfp-ub-input cfp-ub-input-sm"
                   placeholder="9"
                   min={1}
-                  max={12}
+                  max={9}
                 />
-                <span className="cfp-ub-unit">개월 (60세 반영)</span>
+                <span className="cfp-ub-unit">개월 (최대 9)</span>
               </div>
             </div>
             <p className="cfp-ub-hint">실업급여 시뮬레이션 결과를 입력하세요. 60세 연도에 일괄 반영됩니다.</p>

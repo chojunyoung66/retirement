@@ -176,6 +176,18 @@ export default function ProjectionScreen() {
           </div>
         )}
 
+        {projection.simulations.length > 0 && (
+          <div className="card">
+            <div className="card-title">개선 시뮬레이션</div>
+            {projection.simulations.map((sim) => (
+              <div key={sim.label} className="simulation-card">
+                <span className="simulation-label">{sim.label}</span>
+                <span className="simulation-delta">+{formatWan(sim.delta)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {longTermSummary && (
           <div className="card">
             <div className="card-title">20년 총 현금흐름 요약</div>

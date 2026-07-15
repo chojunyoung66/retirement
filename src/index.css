@@ -540,7 +540,7 @@ button {
 .simulation-delta {
   font-size: 14px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--success);
 }
 
 .toast-container {
